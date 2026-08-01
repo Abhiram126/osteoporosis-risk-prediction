@@ -1,7 +1,3 @@
-repository implementation.
-
-BLACKBOXAI Thinking...
-
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.8%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Selenium-4.46-43B02A?style=for-the-badge&logo=selenium&logoColor=white" alt="Selenium">
