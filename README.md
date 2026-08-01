@@ -142,91 +142,209 @@ pip install -r requirements.txt
 ```
 
 
-## 🚀 Quick Start
+# 🚀 Quick Start
 
-### 1. Configure the `.env` file
+Follow these steps to set up and run the SHEIN Web Scraper on a new system.
 
-Create a `.env` file in the project root with your Gemini API key(s).
+## Step 1 — Clone the Repository
 
-**Single key:**
+```bash
+git clone <YOUR_GITHUB_REPOSITORY_URL>
+cd shein_web_scraper_testing
+```
+
+---
+
+## Step 2 — Create a Virtual Environment
+
+### Windows
+
+```bash
+python -m venv venv
+venv\Scripts\activate
+```
+
+### Linux / macOS
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+---
+
+## Step 3 — Install Dependencies
+
+Install all required Python packages.
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Step 4 — Configure the `.env` File
+
+Create a `.env` file in the project root.
+
+### Single API Key
 
 ```dotenv
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-**Multiple keys (automatic rotation on quota exhaustion):**
+### Multiple API Keys (Recommended)
 
 ```dotenv
 GEMINI_API_KEY=OwnerA:KEY_A,OwnerB:KEY_B,OwnerC:KEY_C
 ```
 
-> 💡 **Tip:** Legacy plain comma-separated keys are also supported and are auto-named `key_1`, `key_2`, ...
+> **Tip:** Legacy comma-separated API keys are also supported and will be automatically named (`key_1`, `key_2`, ...).
 
-**Optional environment variables:**
+### Optional Environment Variables
 
 | Variable | Description |
 |----------|-------------|
 | `CHROME_EXECUTABLE_PATH` | Path to a custom Chrome executable |
-| `CHROME_PROFILE_PATH` | Path to an existing Chrome profile (for authenticated sessions) |
-| `HEADLESS` | Set `true` to run headless (default `false`) |
-| `BROWSER_PROXY` | Optional `--proxy-server` value for all browser instances |
+| `CHROME_PROFILE_PATH` | Path to an existing Chrome profile |
+| `HEADLESS` | Set to `true` to run headless (default: `false`) |
+| `BROWSER_PROXY` | Optional proxy server for browser instances |
 
-### 2. Warm up a Chrome profile (recommended)
+---
 
-The scraper works best with an authenticated Chrome profile. Run the manual session setup once:
+## Step 5 — Warm Up a Chrome Profile (Recommended)
+
+Run:
 
 ```bash
 python setup_session.py
 ```
 
-Solve any CAPTCHAs manually in the opened browser window, then press **ENTER** once the product page loads. The session (cookies) is saved to the `ChromeProfile/` directory and reused by the automated scraper.
+If SHEIN displays a verification page or CAPTCHA:
 
-### 3. Run the full pipeline
+- Complete the verification manually.
+- Wait until a product page loads.
+- Press **ENTER** in the terminal.
 
-```bash
-python run_pipeline.py
-```
+The authenticated Chrome session will be saved inside the `ChromeProfile/` directory and reused by future scraping sessions.
 
-You will be prompted to select SHEIN categories. The pipeline then:
+> This step usually needs to be performed only once.
 
-1. **Phase 1 – Discovery** — navigates category pages, dismisses cookie popups, solves verification challenges with Gemini, and harvests product URLs into `Inputs/urls.txt`.
-2. **Phase 2 – Cleaning** — deduplicates and sanitizes the discovered URLs.
-3. **Phase 3 – Scraping** — launches `main.py` to scrape every URL with 3 concurrent browsers and save results.
+---
 
-
-## 🧑‍💻 Usage Reference
-
-### Option A — Full automated pipeline (recommended)
+## Step 6 — Run the Complete Pipeline
 
 ```bash
 python run_pipeline.py
 ```
 
-**Pipeline options:**
+The application will prompt you to select one or more SHEIN categories.
+
+Example:
+
+```
+1. Women
+2. Men
+3. Kids
+4. Beauty
+...
+```
+
+After category selection, the pipeline executes automatically.
+
+### Phase 1 — URL Discovery
+
+- Opens selected category pages
+- Handles cookie popups
+- Solves verification pages using Gemini Vision
+- Discovers product URLs
+- Saves them into:
+
+```
+Inputs/urls.txt
+```
+
+### Phase 2 — URL Cleaning
+
+The discovered URLs are:
+
+- Cleaned
+- Deduplicated
+- Sorted
+- Validated
+
+### Phase 3 — Product Scraping
+
+The scraper:
+
+- Starts the BrowserPool
+- Launches three concurrent Chrome browsers
+- Solves verification pages automatically
+- Extracts product information
+- Continuously writes results to:
+
+```
+Outputs/products.json
+```
+
+---
+
+## Verify the Output
+
+To verify the number of successfully scraped products:
+
+```bash
+python -c "import json; print(len(json.load(open('Outputs/products.json', encoding='utf-8'))))"
+```
+
+Example:
+
+```
+159
+```
+
+---
+
+# 🧑‍💻 Usage Reference
+
+## Option A — Full Automated Pipeline (Recommended)
+
+```bash
+python run_pipeline.py
+```
 
 | Command | Description |
 |---------|-------------|
-| `python run_pipeline.py --target 1000` | Stop discovery after 1000 URLs (default 10000) |
-| `python run_pipeline.py --out Inputs/urls.txt` | Custom output file for discovered URLs |
-| `python run_pipeline.py --categories file.txt` | *Defined in CLI parser; file-loading is currently disabled in code* — categories are chosen interactively |
+| `python run_pipeline.py --target 1000` | Stop URL discovery after 1000 URLs |
+| `python run_pipeline.py --out custom_urls.txt` | Save discovered URLs to a custom file |
+| `python run_pipeline.py --categories file.txt` | CLI option exists, but category file loading is currently disabled. Categories are selected interactively. |
 
-### Option B — Scrape a fixed list of URLs
+---
 
-1. Put product URLs into `Inputs/urls.txt` (one per line, `#` lines are ignored).
-2. Run the core engine:
+## Option B — Scrape Existing URLs
+
+Place product URLs inside:
+
+```
+Inputs/urls.txt
+```
+
+Run:
 
 ```bash
 python main.py
 ```
 
-**Main options:**
+### Available Options
 
 | Command | Description |
 |---------|-------------|
-| `python main.py --verbose` | Enable verbose debug output |
-| `python main.py --target 10` | Scrape at most 10 URLs (0 = unlimited) |
+| `python main.py --verbose` | Enable verbose logging |
+| `python main.py --target 10` | Scrape only the first 10 URLs |
 
-### Option C — Clean your URL list
+---
+
+## Option C — Clean the URL List
 
 ```bash
 python urls_input_file_adder.py
