@@ -242,12 +242,43 @@ The application will prompt you to select one or more SHEIN categories.
 
 Example:
 
-```
-1. Women
-2. Men
-3. Kids
-4. Beauty
+```text
+========================================================
+           Available SHEIN Categories
+========================================================
+
+ 1.  New In
+ 2.  Sale
+ 3.  Women Clothing
+ 4.  Men Clothing
+ 5.  Kids
+ 6.  Curve
+ 7.  Home & Living
+ 8.  Beauty
+ 9.  Jewelry & Accessories
+10.  Shoes
+11.  Bags & Luggage
+12.  Sports & Outdoor
 ...
+26. All Categories
+
+========================================================
+
+Select one or more categories by entering their numbers.
+
+Examples:
+
+1
+→ Scrape only Category 1
+
+1 3 5
+→ Scrape Categories 1, 3, and 5
+
+1,3,5
+→ Comma-separated input is also supported
+
+all
+→ Scrape all 26 categories
 ```
 
 After category selection, the pipeline executes automatically.
